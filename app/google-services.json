@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "268990307579",
+    "firebase_url": "https://cybersecurityfinalproject-default-rtdb.firebaseio.com",
+    "project_id": "cybersecurityfinalproject",
+    "storage_bucket": "cybersecurityfinalproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:268990307579:android:9d759c30ebc5a2076ee45e",
+        "android_client_info": {
+          "package_name": "tr.com.mermela.cybersecurityfinalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtt2inguWFt_khHzWb1afriadea6atDB4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
