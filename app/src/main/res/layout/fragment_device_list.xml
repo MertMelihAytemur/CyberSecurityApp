@@ -20,18 +20,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            tools:text="Cihazlar" />
+            android:text="Devices" />
 
     </Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDevices"
+        tools:listitem="@layout/item_device"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="12dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="4"
         app:layout_constraintBottom_toBottomOf="parent">
-
     </androidx.recyclerview.widget.RecyclerView>
 
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnDownloadMalware"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/baseline_file_download_24"
+        app:backgroundTint="@color/white"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:contentDescription="downloadMalware" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
