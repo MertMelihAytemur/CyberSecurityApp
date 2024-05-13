@@ -12,7 +12,7 @@ import tr.com.mermela.cybersecurityfinalproject.domain.TargetInfo
  */
 class DeviceListAdapter(
     private val deviceList : List<TargetInfo>,
-    private val onDetailButtonClick : () -> Unit
+    private val onDetailButtonClick : (TargetInfo) -> Unit
 ) : RecyclerView.Adapter<DeviceListAdapter.ViewHolder>() {
 
     inner class ViewHolder(private val binding : ItemDeviceBinding) : RecyclerView.ViewHolder(binding.root){
@@ -29,7 +29,7 @@ class DeviceListAdapter(
                 }
 
                 btnDetail.setOnClickListener {
-                    onDetailButtonClick.invoke()
+                    onDetailButtonClick.invoke(target)
                 }
             }
         }

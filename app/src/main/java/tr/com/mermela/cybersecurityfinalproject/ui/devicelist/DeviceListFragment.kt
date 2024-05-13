@@ -17,7 +17,10 @@ import java.io.File
 import java.io.FileOutputStream
 import tr.com.mermela.cybersecurityfinalproject.R
 import tr.com.mermela.cybersecurityfinalproject.databinding.FragmentDeviceListBinding
+import tr.com.mermela.cybersecurityfinalproject.domain.AttackResult
 import tr.com.mermela.cybersecurityfinalproject.domain.TargetInfo
+import tr.com.mermela.cybersecurityfinalproject.ui.MainActivity
+import tr.com.mermela.cybersecurityfinalproject.ui.devicedetail.DeviceDetailFragment
 import tr.com.mermela.cybersecurityfinalproject.ui.devicelist.adapter.DeviceListAdapter
 
 
@@ -54,8 +57,19 @@ class DeviceListFragment : Fragment() {
     }
 
 
-    private fun onDetailClick(){
+    private fun onDetailClick(targetInfo: TargetInfo){
+        val bundle = Bundle().apply {
+            putParcelable("targetInfo", targetInfo)
+        }
 
+        val deviceDetailFragment = DeviceDetailFragment().apply {
+            arguments = bundle
+        }
+
+        (activity as MainActivity).supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer,deviceDetailFragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun loadDataFromFirebase() {
@@ -66,9 +80,10 @@ class DeviceListFragment : Fragment() {
                 val usersList = mutableListOf<TargetInfo>()
                 for (userSnapshot in snapshot.children) {
                     val username = userSnapshot.key ?: "Unknown"
+                    val attackResult = userSnapshot.child("attack/attack_result").getValue(AttackResult::class.java)
                     val attackStatus = userSnapshot.child("attack/attack_status").getValue(String::class.java)
                     val isActive = userSnapshot.child("isActive").getValue(Boolean::class.java)
-                    usersList.add(TargetInfo(username, "", attackStatus, isActive))
+                    usersList.add(TargetInfo(username, attackResult, attackStatus, isActive))
                 }
                 updateRecyclerView(usersList)
                 binding.progressBar.isVisible = false
@@ -82,7 +97,6 @@ class DeviceListFragment : Fragment() {
     }
 
     private fun updateRecyclerView(usersList: MutableList<TargetInfo>) {
-        usersList.add(TargetInfo("elifsimsek", "", "attackStatus", false))
         adapter = DeviceListAdapter(usersList, ::onDetailClick)
         binding.rvDevices.adapter = adapter
     }
