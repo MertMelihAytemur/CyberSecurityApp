@@ -1,14 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/yankees_blue"
     tools:context=".ui.devicedetail.DeviceDetailFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/eerie_black"
+        app:layout_constraintTop_toTopOf="parent">
 
-</FrameLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_toolbar_title"
+            style="@style/Helium.Base.Toolbar.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Device Detail" />
+
+    </Toolbar>
+    
+    
+    <TextView
+        android:id="@+id/tvOs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WINDOWS"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="34dp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/gilroy_medium"/>
+
+
+    <TextView
+        android:id="@+id/tvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UserInfo"
+        app:layout_constraintTop_toBottomOf="@id/tvOs"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/gilroy_bold"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvUsername"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="34dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAttackAgain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/rvResults"
+        android:layout_marginHorizontal="34dp"
+        android:layout_marginTop="24dp"
+        android:text="Attack Again"
+        app:cornerRadius="6dp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

