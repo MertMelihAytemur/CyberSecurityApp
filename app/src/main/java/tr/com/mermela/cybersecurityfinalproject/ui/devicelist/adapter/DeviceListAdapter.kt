@@ -20,13 +20,7 @@ class DeviceListAdapter(
             with(binding){
                 tvUsername.text = target.username
 
-                target.isActive?.let {
-                    btnDetail.isEnabled = it
-
-                    val icon = if(it) R.drawable.ic_active else R.drawable.ic_passive
-
-                    ivStatus.setImageResource(icon)
-                }
+                btnDetail.isEnabled = true
 
                 btnDetail.setOnClickListener {
                     onDetailButtonClick.invoke(target)

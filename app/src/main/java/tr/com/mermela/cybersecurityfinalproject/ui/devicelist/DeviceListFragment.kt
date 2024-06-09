@@ -1,6 +1,5 @@
 package tr.com.mermela.cybersecurityfinalproject.ui.devicelist
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,6 +17,10 @@ import java.io.FileOutputStream
 import tr.com.mermela.cybersecurityfinalproject.R
 import tr.com.mermela.cybersecurityfinalproject.databinding.FragmentDeviceListBinding
 import tr.com.mermela.cybersecurityfinalproject.domain.AttackResult
+import tr.com.mermela.cybersecurityfinalproject.domain.DiskInfo
+import tr.com.mermela.cybersecurityfinalproject.domain.NetworkInfo
+import tr.com.mermela.cybersecurityfinalproject.domain.OsInfo
+import tr.com.mermela.cybersecurityfinalproject.domain.SystemInfo
 import tr.com.mermela.cybersecurityfinalproject.domain.TargetInfo
 import tr.com.mermela.cybersecurityfinalproject.ui.MainActivity
 import tr.com.mermela.cybersecurityfinalproject.ui.devicedetail.DeviceDetailFragment
@@ -38,7 +41,6 @@ class DeviceListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDeviceListBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -56,7 +58,6 @@ class DeviceListFragment : Fragment() {
         }
     }
 
-
     private fun onDetailClick(targetInfo: TargetInfo){
         val bundle = Bundle().apply {
             putParcelable("targetInfo", targetInfo)
@@ -67,7 +68,7 @@ class DeviceListFragment : Fragment() {
         }
 
         (activity as MainActivity).supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer,deviceDetailFragment)
+            .replace(R.id.fragmentContainer, deviceDetailFragment)
             .addToBackStack(null)
             .commit()
     }
@@ -80,17 +81,29 @@ class DeviceListFragment : Fragment() {
                 val usersList = mutableListOf<TargetInfo>()
                 for (userSnapshot in snapshot.children) {
                     val username = userSnapshot.key ?: "Unknown"
-                    val attackResult = userSnapshot.child("attack/attack_result").getValue(AttackResult::class.java)
-                    val attackStatus = userSnapshot.child("attack/attack_status").getValue(String::class.java)
-                    val isActive = userSnapshot.child("isActive").getValue(Boolean::class.java)
-                    usersList.add(TargetInfo(username, attackResult, attackStatus, isActive))
+                    val attackResults = mutableListOf<AttackResult>()
+                    userSnapshot.child("attack/attack_result").children.forEach { resultSnapshot ->
+                        val timestamp = resultSnapshot.child("Timestamp").value as? String ?: "Unknown Time"
+                        val diskInfo = resultSnapshot.child("disk_info").getValue(DiskInfo::class.java) ?: DiskInfo()
+                        val networkInfo = mutableListOf<NetworkInfo>()
+                        resultSnapshot.child("network_info").children.forEach { networkSnapshot ->
+                            val description = networkSnapshot.child("Description").value as? String ?: ""
+                            val ipAddress = networkSnapshot.child("IPAddress").value as? String ?: ""
+                            val macAddress = networkSnapshot.child("MACAddress").value as? String ?: ""
+                            networkInfo.add(NetworkInfo(description, ipAddress, macAddress))
+                        }
+                        val osInfo = resultSnapshot.child("os_info").getValue(OsInfo::class.java) ?: OsInfo()
+                        val systemInfo = resultSnapshot.child("system_info").getValue(SystemInfo::class.java) ?: SystemInfo()
+                        attackResults.add(AttackResult(timestamp, diskInfo, networkInfo, osInfo, systemInfo))
+                    }
+                    usersList.add(TargetInfo(username, attackResults))
                 }
                 updateRecyclerView(usersList)
                 binding.progressBar.isVisible = false
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(context, "Veri yüklenirken hata oluştu: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Firebase'den veri alınamadı: ${error.toException()}", Toast.LENGTH_LONG).show()
                 binding.progressBar.isVisible = false
             }
         })
