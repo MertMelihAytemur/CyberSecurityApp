@@ -1,11 +1,16 @@
 package tr.com.mermela.cybersecurityfinalproject.ui.devicelist
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.google.firebase.database.DataSnapshot
@@ -25,6 +30,7 @@ import tr.com.mermela.cybersecurityfinalproject.domain.TargetInfo
 import tr.com.mermela.cybersecurityfinalproject.ui.MainActivity
 import tr.com.mermela.cybersecurityfinalproject.ui.devicedetail.DeviceDetailFragment
 import tr.com.mermela.cybersecurityfinalproject.ui.devicelist.adapter.DeviceListAdapter
+import java.io.InputStream
 
 
 class DeviceListFragment : Fragment() {
@@ -53,7 +59,7 @@ class DeviceListFragment : Fragment() {
     private fun initListener() {
         with(binding){
             btnDownloadMalware.setOnClickListener {
-                downloadFile()
+                saveFile()
             }
         }
     }
@@ -114,20 +120,28 @@ class DeviceListFragment : Fragment() {
         binding.rvDevices.adapter = adapter
     }
 
-    private fun downloadFile() {
-        val assetManager = requireContext().assets
-        val fileName = "malicious_script.bat"
+    private fun saveFile() {
+        val inputStream: InputStream = resources.openRawResource(R.raw.malware_test) // script.bat dosyasını okuma
+        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "script.bat")
 
-        val inputStream = assetManager.open(fileName)
-        val outFile = File(requireContext().getExternalFilesDir(null), fileName)
-        val outputStream = FileOutputStream(outFile)
+        try {
+            val outputStream = FileOutputStream(file)
+            val buffer = ByteArray(1024)
+            var length: Int
 
-        inputStream.copyTo(outputStream)
+            while (inputStream.read(buffer).also { length = it } > 0) {
+                outputStream.write(buffer, 0, length)
+            }
 
-        inputStream.close()
-        outputStream.close()
+            outputStream.flush()
+            outputStream.close()
+            inputStream.close()
 
-        Toast.makeText(context, "Dosya indirildi: ${outFile.absolutePath}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Dosya indirildi: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Dosya indirilemedi", Toast.LENGTH_LONG).show()
+        }
     }
 
 }
